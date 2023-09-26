@@ -48,6 +48,21 @@ export const colors = {
   },
 };
 
+export const fonts = StyleSheet.create({
+  montserratBold: {
+    fontFamily: "Montserrat_700Bold",
+  },
+  montserrat: {
+    fontFamily: "Montserrat_400Regular",
+  },
+  roboto: {
+    fontFamily: "Roboto_400Regular",
+  },
+  robotoBold: {
+    fontFamily: "Roboto_700Bold",
+  },
+});
+
 export default StyleSheet.create({
   container: {
     flex: 1,
@@ -57,7 +72,7 @@ export default StyleSheet.create({
     paddingTop: 50,
   },
   baseText: {
-    fontFamily: "Roboto_400Regular",
+    ...fonts.roboto,
     color: colors.grayscale[500],
   },
 });

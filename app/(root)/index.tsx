@@ -10,7 +10,7 @@ import In from "../../assets/In.svg";
 import Out from "../../assets/Out.svg";
 import Pin from "../../assets/Pin.svg";
 import MakeRecordCard from "../../src/components/MakeRecordCard";
-import styles, { colors } from "../../src/styles";
+import styles, { colors, fonts } from "../../src/styles";
 
 export default function Home() {
   useFocusEffect(() => {
@@ -41,7 +41,7 @@ export default function Home() {
             style={{
               fontSize: 18,
               color: colors.white,
-              fontFamily: "Roboto_400Regular",
+              ...fonts.roboto,
             }}
           >
             Halo
@@ -51,7 +51,7 @@ export default function Home() {
               fontSize: 24,
               color: colors.white,
               fontWeight: "bold",
-              fontFamily: "Montserrat_700Bold",
+              ...fonts.montserratBold,
             }}
           >
             Akbar Aditama S.P.
@@ -86,7 +86,7 @@ export default function Home() {
             <View style={{ padding: 24, flex: 1 }}>
               <Text
                 style={{
-                  fontFamily: "Montserrat_700Bold",
+                  ...fonts.montserratBold,
                   fontSize: 16,
                   color: colors.grayscale[800],
                 }}
@@ -95,7 +95,7 @@ export default function Home() {
               </Text>
               <Text
                 style={{
-                  fontFamily: "Roboto_400Regular",
+                  ...fonts.roboto,
                   color: colors.grayscale[700],
                 }}
               >
@@ -103,7 +103,12 @@ export default function Home() {
               </Text>
             </View>
             <View style={{ paddingRight: 24 }}>
-              <Calendar width={42} height={42} style={{ opacity: 0.8 }} />
+              <Calendar
+                width={42}
+                height={42}
+                style={{ opacity: 0.7 }}
+                color={colors.grayscale[900]}
+              />
             </View>
           </View>
         </View>
@@ -121,7 +126,7 @@ export default function Home() {
         <Text
           style={{
             color: colors.grayscale[100],
-            fontFamily: "Roboto_400Regular",
+            ...fonts.roboto,
             flex: 1,
           }}
         >
@@ -131,7 +136,7 @@ export default function Home() {
           style={{
             padding: 12,
             color: colors.primary[400],
-            fontFamily: "Roboto_700Bold",
+            ...fonts.robotoBold,
             marginRight: -7,
           }}
         >
