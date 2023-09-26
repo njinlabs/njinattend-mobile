@@ -46,6 +46,17 @@ export const colors = {
     800: "#3c0e0e",
     900: "#1e0707",
   },
+  blue: {
+    100: "#cddaee",
+    200: "#9bb5dd",
+    300: "#6991cb",
+    400: "#376cba",
+    500: "#0547a9",
+    600: "#043987",
+    700: "#032b65",
+    800: "#021c44",
+    900: "#010e22",
+  },
 };
 
 export const fonts = StyleSheet.create({
