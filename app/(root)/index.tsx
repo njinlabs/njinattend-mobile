@@ -1,18 +1,33 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { Camera, CameraType } from "expo-camera";
 import { Link, useFocusEffect } from "expo-router";
 import {
   setStatusBarBackgroundColor,
   setStatusBarStyle,
 } from "expo-status-bar";
-import { Modal, Platform, Text, View } from "react-native";
+import { useEffect } from "react";
+import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 import Calendar from "../../assets/Calendar.svg";
 import CardBackground from "../../assets/CardBackground.svg";
 import In from "../../assets/In.svg";
 import Out from "../../assets/Out.svg";
 import Pin from "../../assets/Pin.svg";
+import BlockButton from "../../src/components/BlockButton";
 import MakeRecordCard from "../../src/components/MakeRecordCard";
 import styles, { colors, fonts } from "../../src/styles";
+import { useState } from "react";
+import { PanGestureHandler, State } from "react-native-gesture-handler";
 
 export default function Home() {
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [attendShown, setAttendShown] = useState(false);
+
+  useEffect(() => {
+    if (!permission?.granted && attendShown) {
+      requestPermission();
+    }
+  }, [attendShown]);
+
   useFocusEffect(() => {
     if (Platform.OS === "android")
       setStatusBarBackgroundColor(colors.grayscale[800], true);
@@ -154,8 +169,122 @@ export default function Home() {
             color="red"
             style={{ marginTop: 24 }}
           />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <BlockButton
+              style={{
+                flex: 1,
+                marginRight: 8,
+              }}
+              onPress={() => setAttendShown(true)}
+            >
+              <Text style={{ marginLeft: 8 }}> Absen Masuk</Text>
+            </BlockButton>
+            <BlockButton
+              style={{
+                flex: 1,
+                marginLeft: 8,
+              }}
+              onPress={() => setAttendShown(true)}
+            >
+              Absen Keluar
+            </BlockButton>
+          </View>
         </View>
       </View>
+      {attendShown && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: colors.black,
+            opacity: 0.5,
+          }}
+        />
+      )}
+      <Modal
+        visible={attendShown}
+        animationType="slide"
+        onRequestClose={() => setAttendShown(false)}
+        transparent={true}
+      >
+        <PanGestureHandler
+          onGestureEvent={(e) => {
+            if (
+              e.nativeEvent.translationY > 50 &&
+              e.nativeEvent.state === State.ACTIVE
+            ) {
+              setAttendShown(false);
+            }
+          }}
+        >
+          <View style={{ flex: 1, justifyContent: "flex-end" }}>
+            <View
+              style={{
+                backgroundColor: colors.white,
+                padding: 24,
+                borderTopLeftRadius: 8,
+                borderTopRightRadius: 8,
+              }}
+            >
+              <View style={{ alignItems: "flex-end" }}>
+                <TouchableOpacity
+                  activeOpacity={0.5}
+                  style={{
+                    padding: 24,
+                    marginTop: -24,
+                    marginRight: -24,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                  onPress={() => setAttendShown(false)}
+                >
+                  <Text
+                    style={{
+                      ...styles.baseText,
+                    }}
+                  >
+                    Tutup
+                  </Text>
+                  <MaterialIcons
+                    name="close"
+                    size={24}
+                    color={colors.grayscale[800]}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  backgroundColor: colors.grayscale[100],
+                  aspectRatio: 1,
+                  borderRadius: 6,
+                  overflow: "hidden",
+                }}
+              >
+                {permission?.granted && attendShown && (
+                  <Camera
+                    type={CameraType.front}
+                    ratio="1:1"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                )}
+              </View>
+              <BlockButton>Ambil</BlockButton>
+            </View>
+          </View>
+        </PanGestureHandler>
+      </Modal>
     </>
   );
 }
