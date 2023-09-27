@@ -4,9 +4,12 @@ import {
 } from "@expo-google-fonts/montserrat";
 import { Roboto_400Regular, Roboto_700Bold } from "@expo-google-fonts/roboto";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { SplashScreen, Stack, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { colors } from "../src/styles";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function AppLayout() {
   const [fontsLoaded] = useFonts({
@@ -15,6 +18,12 @@ export default function AppLayout() {
     Roboto_400Regular,
     Roboto_700Bold,
   });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      router.replace("/login");
+    }
+  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
@@ -39,8 +48,12 @@ export default function AppLayout() {
           name="attend-point"
           options={{ title: "Lokasi Absen Terdekat" }}
         />
+        <Stack.Screen
+          name="login"
+          options={{ title: "Login", headerShown: false }}
+        />
       </Stack>
-      <StatusBar backgroundColor="white" />
+      <StatusBar backgroundColor={colors.grayscale[800]} style="dark" />
     </>
   );
 }

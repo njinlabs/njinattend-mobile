@@ -7,44 +7,53 @@ import {
   TextStyle,
 } from "react-native";
 import { colors, fonts } from "../styles";
+import { forwardRef, LegacyRef } from "react";
 
 type BlockButtonProps = {
   children: React.ReactNode;
   textProps?: TextProps;
 };
 
-export default function BlockButton({
-  children,
-  style,
-  textProps: { style: textStyle, ...textProps } = {},
-  ...props
-}: BlockButtonProps & TouchableOpacityProps) {
-  return (
-    <TouchableOpacity
-      {...props}
-      style={{
-        padding: 16,
-        backgroundColor: colors.primary[500],
-        borderRadius: 50,
-        borderWidth: 1,
-        borderColor: colors.primary[600],
-        marginVertical: 24,
-        ...(style as ViewStyle),
-      }}
-      activeOpacity={0.8}
-    >
-      <Text
+const BlockButton = forwardRef(
+  (
+    {
+      children,
+      style,
+      textProps: { style: textStyle, ...textProps } = {},
+      ...props
+    }: BlockButtonProps & TouchableOpacityProps,
+    ref: LegacyRef<TouchableOpacity>
+  ) => {
+    return (
+      <TouchableOpacity
+        {...props}
         style={{
-          ...fonts.montserratBold,
-          color: colors.grayscale[800],
-          textAlign: "center",
-          verticalAlign: "middle",
-          ...(textStyle as TextStyle),
+          padding: 16,
+          backgroundColor: colors.primary[500],
+          borderRadius: 50,
+          borderWidth: 1,
+          borderColor: colors.primary[600],
+          marginVertical: 24,
+          ...(style as ViewStyle),
         }}
-        {...textProps}
+        activeOpacity={0.8}
+        ref={ref}
       >
-        {children}
-      </Text>
-    </TouchableOpacity>
-  );
-}
+        <Text
+          style={{
+            ...fonts.montserratBold,
+            color: colors.grayscale[800],
+            textAlign: "center",
+            verticalAlign: "middle",
+            ...(textStyle as TextStyle),
+          }}
+          {...textProps}
+        >
+          {children}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+);
+
+export default BlockButton;
