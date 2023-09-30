@@ -4,13 +4,13 @@ import {
 } from "@expo-google-fonts/montserrat";
 import { Roboto_400Regular, Roboto_700Bold } from "@expo-google-fonts/roboto";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router } from "expo-router";
+import { SplashScreen, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
 import { Provider } from "react-redux";
 import Loader from "../src/components/Loader";
 import store from "../src/redux/store";
 import { colors } from "../src/styles";
+import CheckToken from "../src/components/CheckToken";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,18 +22,13 @@ export default function AppLayout() {
     Roboto_700Bold,
   });
 
-  useEffect(() => {
-    if (fontsLoaded) {
-      router.replace("/login");
-    }
-  }, [fontsLoaded]);
-
   if (!fontsLoaded) {
     return null;
   }
 
   return (
     <Provider store={store}>
+      <CheckToken />
       <Stack
         screenOptions={() => ({
           headerTitleStyle: {
