@@ -7,6 +7,9 @@ import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { Provider } from "react-redux";
+import Loader from "../src/components/Loader";
+import store from "../src/redux/store";
 import { colors } from "../src/styles";
 
 SplashScreen.preventAutoHideAsync();
@@ -30,7 +33,7 @@ export default function AppLayout() {
   }
 
   return (
-    <>
+    <Provider store={store}>
       <Stack
         screenOptions={() => ({
           headerTitleStyle: {
@@ -54,6 +57,7 @@ export default function AppLayout() {
         />
       </Stack>
       <StatusBar backgroundColor={colors.grayscale[800]} style="dark" />
-    </>
+      <Loader />
+    </Provider>
   );
 }
