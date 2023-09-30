@@ -25,6 +25,10 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-router", "expo-camera"]
+    "plugins": [
+      "expo-router",
+      "expo-camera",
+      ["expo-location", "locationAlwaysAndWhenInUsePermission"]
+    ]
   }
 }

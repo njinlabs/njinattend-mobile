@@ -17,10 +17,36 @@ import MakeRecordCard from "../../src/components/MakeRecordCard";
 import styles, { colors, fonts } from "../../src/styles";
 import { useState } from "react";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
+import { useAppSelector } from "../../src/redux/hooks";
+import moment from "moment";
+import * as Location from "expo-location";
+import { useApi } from "../../src/api/api";
+import locationIndex from "../../src/api/requests/location/location-index";
 
 export default function Home() {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [attendShown, setAttendShown] = useState(false);
+  const { data: user } = useAppSelector((state) => state.user);
+  const [locationError, setLocationError] = useState(true);
+  const [location, setLocation] = useState<Location.LocationObject>();
+
+  const locationIndexApi = useApi({
+    api: locationIndex,
+  });
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === "granted") {
+        setLocationError(false);
+      } else {
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
 
   useEffect(() => {
     if (!permission?.granted && attendShown) {
@@ -38,6 +64,28 @@ export default function Home() {
       setStatusBarStyle("auto");
     };
   });
+
+  useEffect(() => {
+    if (location) {
+      locationIndexApi.process({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    }
+  }, [location]);
+
+  if (locationError)
+    return (
+      <View
+        style={{
+          ...styles.container,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={styles.baseText}>Lokasi tidak diizinkan</Text>
+      </View>
+    );
 
   return (
     <>
@@ -70,7 +118,7 @@ export default function Home() {
                 ...fonts.montserratBold,
               }}
             >
-              Akbar Aditama S.P.
+              {user?.fullname}
             </Text>
             <View
               style={{
@@ -107,7 +155,7 @@ export default function Home() {
                     color: colors.grayscale[800],
                   }}
                 >
-                  Senin
+                  {moment().format("dddd")}
                 </Text>
                 <Text
                   style={{
@@ -115,7 +163,7 @@ export default function Home() {
                     color: colors.grayscale[700],
                   }}
                 >
-                  25 September 2023
+                  {moment().format("DD MMMM YYYY")}
                 </Text>
               </View>
               <View style={{ paddingRight: 24 }}>
@@ -146,7 +194,11 @@ export default function Home() {
               flex: 1,
             }}
           >
-            Sadar Office
+            {locationIndexApi.isLoading
+              ? "Mencari..."
+              : locationIndexApi.data?.rows.find(
+                  (location) => location.distance && location.distance < 0.5
+                )?.name || "Diluar area"}
           </Text>
           <Link
             href="/attend-point"

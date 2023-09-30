@@ -11,6 +11,10 @@ import Loader from "../src/components/Loader";
 import store from "../src/redux/store";
 import { colors } from "../src/styles";
 import CheckToken from "../src/components/CheckToken";
+import moment from "moment";
+import "moment/locale/id";
+
+moment.locale("id");
 
 SplashScreen.preventAutoHideAsync();
 

@@ -2,8 +2,10 @@ import { Text, View } from "react-native";
 import styles, { colors, fonts } from "../../src/styles";
 import { Ionicons } from "@expo/vector-icons";
 import MenuList from "../../src/components/MenuList";
+import { useAppSelector } from "../../src/redux/hooks";
 
 export default function Setting() {
+  const { data: user } = useAppSelector((state) => state.user);
   return (
     <View style={styles.container}>
       <View
@@ -37,12 +39,12 @@ export default function Setting() {
             marginTop: 16,
           }}
         >
-          Akbar Aditama S.P.
+          {user?.fullname}
         </Text>
         <Text style={{ ...styles.baseText, marginTop: 4, marginBottom: 2 }}>
-          Software Engineer
+          {user?.department}
         </Text>
-        <Text style={styles.baseText}>836827674</Text>
+        <Text style={styles.baseText}>{user?.registered_number}</Text>
       </View>
       <View
         style={{
