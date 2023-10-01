@@ -52,6 +52,10 @@ export default function AppLayout() {
           options={{ title: "Lokasi Absen Terdekat" }}
         />
         <Stack.Screen
+          name="change-password"
+          options={{ title: "Ganti Password" }}
+        />
+        <Stack.Screen
           name="login"
           options={{ title: "Login", headerShown: false }}
         />

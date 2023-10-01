@@ -1,18 +1,18 @@
-import { Image, Text, View } from "react-native";
-import styles, { colors, fonts } from "../../src/styles";
 import { Ionicons } from "@expo/vector-icons";
-import MenuList from "../../src/components/MenuList";
-import { useAppDispatch, useAppSelector } from "../../src/redux/hooks";
-import { FileType } from "../../src/api/models/file";
-import generateUrl from "../../src/generate-url";
-import { useApi } from "../../src/api/api";
-import signOut from "../../src/api/requests/auth/sign-out";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { hideLoading, showLoading } from "../../src/redux/slices/interface";
+import { Image, Text, View } from "react-native";
+import { useApi } from "../../src/api/api";
 import client from "../../src/api/client";
+import { FileType } from "../../src/api/models/file";
+import signOut from "../../src/api/requests/auth/sign-out";
+import MenuList from "../../src/components/MenuList";
+import generateUrl from "../../src/generate-url";
+import { useAppDispatch, useAppSelector } from "../../src/redux/hooks";
+import { hideLoading, showLoading } from "../../src/redux/slices/interface";
 import { logout } from "../../src/redux/slices/user";
+import styles, { colors, fonts } from "../../src/styles";
 
 export default function Setting() {
   const { data: user } = useAppSelector((state) => state.user);
@@ -94,7 +94,12 @@ export default function Setting() {
           backgroundColor: colors.white,
         }}
       >
-        <MenuList icon="lock-closed-outline">Ganti Password</MenuList>
+        <MenuList
+          icon="lock-closed-outline"
+          onPress={() => router.push("/change-password")}
+        >
+          Ganti Password
+        </MenuList>
         <MenuList icon="log-out-outline" onPress={() => signOutApi.process({})}>
           Keluar
         </MenuList>
