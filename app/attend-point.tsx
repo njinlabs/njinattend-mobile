@@ -1,18 +1,94 @@
-import { ScrollView } from "react-native";
-import styles from "../src/styles";
+import { useEffect, useState } from "react";
+import { FlatList, RefreshControl, ScrollView, Text, View } from "react-native";
+import { useApi } from "../src/api/api";
+import locationIndex from "../src/api/requests/location/location-index";
 import LocationList from "../src/components/LocationList";
+import styles from "../src/styles";
+import * as Location from "expo-location";
+import { useAppDispatch } from "../src/redux/hooks";
+import { hideLoading, showLoading } from "../src/redux/slices/interface";
 
 export default function AttendPoint() {
+  const [locationError, setLocationError] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [location, setLocation] = useState<Location.LocationObject>();
+  const dispatch = useAppDispatch();
+
+  const locationIndexApi = useApi({
+    api: locationIndex,
+  });
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (location) {
+      await locationIndexApi.process({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(showLoading());
+
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === "granted") {
+        setLocationError(false);
+      } else {
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (location) {
+      (async () => {
+        await locationIndexApi.process({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+
+        dispatch(hideLoading());
+      })();
+    }
+  }, [location]);
+
+  if (locationError)
+    return (
+      <View
+        style={{
+          ...styles.container,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={styles.baseText}>Lokasi tidak diizinkan</Text>
+      </View>
+    );
+
   return (
-    <ScrollView
+    <FlatList
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={() => onRefresh()} />
+      }
+      data={locationIndexApi.data?.rows || []}
       style={styles.container}
+      keyExtractor={(_, index) => `${index}`}
       contentContainerStyle={{ paddingTop: 24 }}
-    >
-      <LocationList />
-      <LocationList />
-      <LocationList />
-      <LocationList />
-      <LocationList />
-    </ScrollView>
+      renderItem={({ item }) => (
+        <LocationList
+          name={item.name!}
+          distance={item.distance!}
+          latitude={item.latitude!}
+          longitude={item.longitude!}
+        />
+      )}
+    />
   );
 }

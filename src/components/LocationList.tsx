@@ -1,10 +1,27 @@
-import { Text, View } from "react-native";
-import styles, { colors, fonts } from "../styles";
+import {
+  Linking,
+  Platform,
+  Text,
+  Touchable,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import Pin from "../../assets/Pin.svg";
-import In from "../../assets/In.svg";
-import Out from "../../assets/Out.svg";
+import styles, { colors, fonts } from "../styles";
 
-export default function LocationList() {
+type LocationListProps = {
+  name: string;
+  distance: number;
+  latitude: number;
+  longitude: number;
+};
+
+export default function LocationList({
+  name,
+  distance,
+  latitude,
+  longitude,
+}: LocationListProps) {
   return (
     <View
       style={{
@@ -46,24 +63,39 @@ export default function LocationList() {
               fontSize: 16,
             }}
           >
-            Sadar Office
+            {name}
           </Text>
-          <Text style={styles.baseText}>12km</Text>
+          <Text style={styles.baseText}>
+            {distance < 1 && "<"}
+            {Math.ceil(distance)} km
+          </Text>
         </View>
       </View>
-      <View
-        style={{
-          paddingHorizontal: 24,
-          paddingVertical: 16,
-          borderTopWidth: 1,
-          borderColor: colors.grayscale[100],
-          alignItems: "center",
+      <TouchableWithoutFeedback
+        onPress={() => {
+          Linking.openURL(
+            Platform.select({
+              ios: `http://maps.apple.com/?daddr=${latitude},${longitude}`,
+              android: `http://maps.google.com/?daddr=${latitude},${longitude}`,
+              default: "",
+            })
+          );
         }}
       >
-        <Text style={{ ...fonts.robotoBold, color: colors.blue[500] }}>
-          Lihat Rute
-        </Text>
-      </View>
+        <View
+          style={{
+            paddingHorizontal: 24,
+            paddingVertical: 16,
+            borderTopWidth: 1,
+            borderColor: colors.grayscale[100],
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ ...fonts.robotoBold, color: colors.blue[500] }}>
+            Lihat Rute
+          </Text>
+        </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }
