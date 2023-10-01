@@ -24,8 +24,9 @@ export default function CheckToken() {
         router.replace("/login");
       }
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data, token) => {
       const { token: _, ...user } = data!;
+      client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       dispatch(login(user));
     },
   });
@@ -55,15 +56,6 @@ export default function CheckToken() {
       SplashScreen.hideAsync();
     }
   }, [user, fakeLoad]);
-
-  useEffect(() => {
-    if (user.logged) {
-      (async () => {
-        const token = await AsyncStorage.getItem("token");
-        client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      })();
-    }
-  }, [user]);
 
   return null;
 }

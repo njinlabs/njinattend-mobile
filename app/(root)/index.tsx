@@ -9,7 +9,15 @@ import {
 } from "expo-status-bar";
 import moment from "moment";
 import { LegacyRef, useEffect, useRef, useState } from "react";
-import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
 import Calendar from "../../assets/Calendar.svg";
 import CardBackground from "../../assets/CardBackground.svg";
@@ -30,23 +38,43 @@ import {
 import styles, { colors, fonts } from "../../src/styles";
 import toFile from "../../src/to-file";
 import saveOut from "../../src/api/requests/attendance.ts/save-out";
+import attendanceToday from "../../src/api/requests/attendance.ts/attendance-today";
 
 export default function Home() {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [attendShown, setAttendShown] = useState<boolean | "in" | "out">(false);
   const { data: user } = useAppSelector((state) => state.user);
   const [locationError, setLocationError] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [location, setLocation] = useState<Location.LocationObject>();
   const cameraRef = useRef<Camera>();
   const dispatch = useAppDispatch();
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (location) {
+      await locationIndexApi.process({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    }
+
+    await attendanceTodayApi.process({});
+    setRefreshing(false);
+  };
 
   const locationIndexApi = useApi({
     api: locationIndex,
   });
 
+  const attendanceTodayApi = useApi({
+    api: attendanceToday,
+  });
+
   const saveInApi = useApi({
     api: saveIn,
     onSuccess: () => {
+      attendanceTodayApi.process({});
       dispatch(toast("Berhasil"));
     },
     onFail: () => {
@@ -57,6 +85,7 @@ export default function Home() {
   const saveOutApi = useApi({
     api: saveOut,
     onSuccess: () => {
+      attendanceTodayApi.process({});
       dispatch(toast("Berhasil"));
     },
     onFail: () => {
@@ -131,13 +160,19 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (location) {
+    if (location && user) {
       locationIndexApi.process({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
     }
-  }, [location]);
+  }, [location, user]);
+
+  useEffect(() => {
+    if (user) {
+      attendanceTodayApi.process({});
+    }
+  }, [user]);
 
   useEffect(() => {
     if (saveInApi.isLoading || saveOutApi.isLoading) {
@@ -162,7 +197,15 @@ export default function Home() {
 
   return (
     <>
-      <View style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => onRefresh()}
+          />
+        }
+      >
         <View
           style={{
             backgroundColor: colors.grayscale[800],
@@ -287,12 +330,20 @@ export default function Home() {
           </Link>
         </View>
         <View style={{ flex: 1, padding: 24 }}>
-          <MakeRecordCard icon={In} title="Masuk" color="green" />
+          <MakeRecordCard
+            icon={In}
+            title="Masuk"
+            color="green"
+            loading={attendanceTodayApi.isLoading}
+            record={attendanceTodayApi.data?.in_record || undefined}
+          />
           <MakeRecordCard
             icon={Out}
             title="Keluar"
             color="red"
             style={{ marginTop: 24 }}
+            loading={attendanceTodayApi.isLoading}
+            record={attendanceTodayApi.data?.out_record || undefined}
           />
           <View
             style={{
@@ -321,7 +372,7 @@ export default function Home() {
             </BlockButton>
           </View>
         </View>
-      </View>
+      </ScrollView>
       {attendShown && (
         <View
           style={{

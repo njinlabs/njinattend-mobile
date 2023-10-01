@@ -2,12 +2,15 @@ import { StyleProp, Text, View, ViewComponent, ViewStyle } from "react-native";
 import styles, { colors } from "../styles";
 import { FC } from "react";
 import { SvgProps } from "react-native-svg";
+import moment from "moment";
 
 type MakeRecordCardProps = {
   icon: FC<SvgProps>;
   color: keyof typeof colors;
   title: string;
   style?: ViewStyle;
+  record?: string;
+  loading?: boolean;
 };
 
 export default function MakeRecordCard({
@@ -15,6 +18,8 @@ export default function MakeRecordCard({
   color,
   title,
   style,
+  record,
+  loading,
 }: MakeRecordCardProps) {
   return (
     <View
@@ -55,7 +60,13 @@ export default function MakeRecordCard({
         >
           {title}
         </Text>
-        <Text style={styles.baseText}>Belum ada record</Text>
+        <Text style={styles.baseText}>
+          {loading
+            ? "Memuat..."
+            : record
+            ? moment(record).format("HH:mm")
+            : "Belum ada record"}
+        </Text>
       </View>
     </View>
   );
