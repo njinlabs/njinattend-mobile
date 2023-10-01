@@ -2,12 +2,40 @@ import { Image, Text, View } from "react-native";
 import styles, { colors, fonts } from "../../src/styles";
 import { Ionicons } from "@expo/vector-icons";
 import MenuList from "../../src/components/MenuList";
-import { useAppSelector } from "../../src/redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../src/redux/hooks";
 import { FileType } from "../../src/api/models/file";
 import generateUrl from "../../src/generate-url";
+import { useApi } from "../../src/api/api";
+import signOut from "../../src/api/requests/auth/sign-out";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import { useEffect } from "react";
+import { hideLoading, showLoading } from "../../src/redux/slices/interface";
+import client from "../../src/api/client";
+import { logout } from "../../src/redux/slices/user";
 
 export default function Setting() {
   const { data: user } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+
+  const signOutApi = useApi({
+    api: signOut,
+    onSuccess: async () => {
+      await AsyncStorage.removeItem("token");
+      client.defaults.headers.common["Authorization"] = undefined;
+      dispatch(logout());
+      router.replace("/login");
+    },
+  });
+
+  useEffect(() => {
+    if (signOutApi.isLoading) {
+      dispatch(showLoading());
+    } else {
+      dispatch(hideLoading());
+    }
+  }, [signOutApi.isLoading]);
+
   return (
     <View style={styles.container}>
       <View
@@ -67,7 +95,9 @@ export default function Setting() {
         }}
       >
         <MenuList icon="lock-closed-outline">Ganti Password</MenuList>
-        <MenuList icon="log-out-outline">Keluar</MenuList>
+        <MenuList icon="log-out-outline" onPress={() => signOutApi.process({})}>
+          Keluar
+        </MenuList>
       </View>
     </View>
   );

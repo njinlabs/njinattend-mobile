@@ -14,6 +14,7 @@ import { useAppDispatch } from "../src/redux/hooks";
 import { hideLoading, showLoading } from "../src/redux/slices/interface";
 import { login } from "../src/redux/slices/user";
 import styles, { colors, fonts } from "../src/styles";
+import client from "../src/api/client";
 
 export default function Login() {
   const dispatch = useAppDispatch();
@@ -31,6 +32,7 @@ export default function Login() {
     onSuccess: async (data) => {
       const { token, ...user } = data!;
       await AsyncStorage.setItem("token", token!);
+      client.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       dispatch(login(user));
       dispatch(hideLoading());
       router.replace("/");

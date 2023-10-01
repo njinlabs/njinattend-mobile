@@ -1,4 +1,9 @@
-import { Text, View } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles, { colors } from "../styles";
 
@@ -7,9 +12,16 @@ type MenuListProps = {
   icon: keyof typeof Ionicons.glyphMap;
 };
 
-export default function MenuList({ children, icon }: MenuListProps) {
+export default function MenuList({
+  children,
+  icon,
+  onPress,
+}: MenuListProps & TouchableOpacityProps) {
   return (
-    <View style={{ flexDirection: "row", alignItems: "center" }}>
+    <TouchableOpacity
+      style={{ flexDirection: "row", alignItems: "center" }}
+      onPress={onPress}
+    >
       <View
         style={{
           justifyContent: "center",
@@ -39,6 +51,6 @@ export default function MenuList({ children, icon }: MenuListProps) {
           {children}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
