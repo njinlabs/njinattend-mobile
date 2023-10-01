@@ -6,6 +6,7 @@ import HistoryList from "../../src/components/HistoryList";
 import { useAppDispatch } from "../../src/redux/hooks";
 import { hideLoading, showLoading } from "../../src/redux/slices/interface";
 import styles from "../../src/styles";
+import NotFound from "../../src/components/NotFound";
 
 export default function History() {
   const [refreshing, setRefreshing] = useState(false);
@@ -30,6 +31,18 @@ export default function History() {
       dispatch(hideLoading());
     })();
   }, []);
+
+  if (!attendanceHistoryApi.data?.rows.length)
+    return (
+      <NotFound
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => onRefresh()}
+          />
+        }
+      />
+    );
 
   return (
     <FlatList

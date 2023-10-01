@@ -7,6 +7,7 @@ import LocationList from "../src/components/LocationList";
 import { useAppDispatch } from "../src/redux/hooks";
 import { hideLoading, showLoading } from "../src/redux/slices/interface";
 import styles from "../src/styles";
+import NotFound from "../src/components/NotFound";
 
 export default function AttendPoint() {
   const [locationError, setLocationError] = useState(true);
@@ -70,6 +71,18 @@ export default function AttendPoint() {
       >
         <Text style={styles.baseText}>Lokasi tidak diizinkan</Text>
       </View>
+    );
+
+  if (!locationIndexApi.data?.rows.length)
+    return (
+      <NotFound
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => onRefresh()}
+          />
+        }
+      />
     );
 
   return (
