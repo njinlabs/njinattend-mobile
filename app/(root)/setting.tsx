@@ -1,8 +1,10 @@
-import { Text, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import styles, { colors, fonts } from "../../src/styles";
 import { Ionicons } from "@expo/vector-icons";
 import MenuList from "../../src/components/MenuList";
 import { useAppSelector } from "../../src/redux/hooks";
+import { FileType } from "../../src/api/models/file";
+import generateUrl from "../../src/generate-url";
 
 export default function Setting() {
   const { data: user } = useAppSelector((state) => state.user);
@@ -23,13 +25,22 @@ export default function Setting() {
             borderRadius: 84 / 2,
             justifyContent: "center",
             alignItems: "center",
+            overflow: "hidden",
           }}
         >
-          <Ionicons
-            name="md-person-outline"
-            size={32}
-            color={colors.grayscale[400]}
-          />
+          {user?.avatar ? (
+            <Image
+              source={{ uri: generateUrl((user.avatar as FileType).url!) }}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="cover"
+            />
+          ) : (
+            <Ionicons
+              name="md-person-outline"
+              size={32}
+              color={colors.grayscale[400]}
+            />
+          )}
         </View>
         <Text
           style={{

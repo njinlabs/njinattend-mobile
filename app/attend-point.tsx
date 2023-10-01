@@ -1,12 +1,12 @@
+import * as Location from "expo-location";
 import { useEffect, useState } from "react";
-import { FlatList, RefreshControl, ScrollView, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { useApi } from "../src/api/api";
 import locationIndex from "../src/api/requests/location/location-index";
 import LocationList from "../src/components/LocationList";
-import styles from "../src/styles";
-import * as Location from "expo-location";
 import { useAppDispatch } from "../src/redux/hooks";
 import { hideLoading, showLoading } from "../src/redux/slices/interface";
+import styles from "../src/styles";
 
 export default function AttendPoint() {
   const [locationError, setLocationError] = useState(true);
@@ -21,7 +21,7 @@ export default function AttendPoint() {
   const onRefresh = async () => {
     setRefreshing(true);
     if (location) {
-      await locationIndexApi.process({
+      await locationIndexApi.withoutReset().process({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });

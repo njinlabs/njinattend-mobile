@@ -3,8 +3,19 @@ import styles, { colors, fonts } from "../styles";
 import Calendar from "../../assets/Calendar.svg";
 import In from "../../assets/In.svg";
 import Out from "../../assets/Out.svg";
+import moment from "moment";
 
-export default function HistoryList() {
+type HistoryListProps = {
+  period: string;
+  inRecord: string;
+  outRecord: string;
+};
+
+export default function HistoryList({
+  period,
+  inRecord,
+  outRecord,
+}: HistoryListProps) {
   return (
     <View
       style={{
@@ -46,9 +57,11 @@ export default function HistoryList() {
               fontSize: 16,
             }}
           >
-            Senin
+            {moment(period).format("dddd")}
           </Text>
-          <Text style={styles.baseText}>25 September 2023</Text>
+          <Text style={styles.baseText}>
+            {moment(period).format("DD MMMM YYYY")}
+          </Text>
         </View>
       </View>
       <View
@@ -68,7 +81,9 @@ export default function HistoryList() {
             style={{ marginRight: 8 }}
             color={colors.grayscale[800]}
           />
-          <Text style={styles.baseText}>10:00</Text>
+          <Text style={styles.baseText}>
+            {moment(inRecord).format("HH:mm")}
+          </Text>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Out
@@ -76,7 +91,9 @@ export default function HistoryList() {
             style={{ marginRight: 8 }}
             color={colors.grayscale[800]}
           />
-          <Text style={styles.baseText}>10:00</Text>
+          <Text style={styles.baseText}>
+            {moment(outRecord).format("HH:mm")}
+          </Text>
         </View>
       </View>
     </View>
