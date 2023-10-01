@@ -1,38 +1,103 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Camera, CameraType } from "expo-camera";
+import { AutoFocus, Camera, CameraType, FlashMode } from "expo-camera";
+import { FlipType, SaveFormat, manipulateAsync } from "expo-image-manipulator";
+import * as Location from "expo-location";
 import { Link, useFocusEffect } from "expo-router";
 import {
   setStatusBarBackgroundColor,
   setStatusBarStyle,
 } from "expo-status-bar";
-import { useEffect } from "react";
+import moment from "moment";
+import { LegacyRef, useEffect, useRef, useState } from "react";
 import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
+import { PanGestureHandler, State } from "react-native-gesture-handler";
 import Calendar from "../../assets/Calendar.svg";
 import CardBackground from "../../assets/CardBackground.svg";
 import In from "../../assets/In.svg";
 import Out from "../../assets/Out.svg";
 import Pin from "../../assets/Pin.svg";
+import { useApi } from "../../src/api/api";
+import saveIn from "../../src/api/requests/attendance.ts/save-in";
+import locationIndex from "../../src/api/requests/location/location-index";
 import BlockButton from "../../src/components/BlockButton";
 import MakeRecordCard from "../../src/components/MakeRecordCard";
+import { useAppDispatch, useAppSelector } from "../../src/redux/hooks";
+import {
+  hideLoading,
+  showLoading,
+  toast,
+} from "../../src/redux/slices/interface";
 import styles, { colors, fonts } from "../../src/styles";
-import { useState } from "react";
-import { PanGestureHandler, State } from "react-native-gesture-handler";
-import { useAppSelector } from "../../src/redux/hooks";
-import moment from "moment";
-import * as Location from "expo-location";
-import { useApi } from "../../src/api/api";
-import locationIndex from "../../src/api/requests/location/location-index";
+import toFile from "../../src/to-file";
+import saveOut from "../../src/api/requests/attendance.ts/save-out";
 
 export default function Home() {
   const [permission, requestPermission] = Camera.useCameraPermissions();
-  const [attendShown, setAttendShown] = useState(false);
+  const [attendShown, setAttendShown] = useState<boolean | "in" | "out">(false);
   const { data: user } = useAppSelector((state) => state.user);
   const [locationError, setLocationError] = useState(true);
   const [location, setLocation] = useState<Location.LocationObject>();
+  const cameraRef = useRef<Camera>();
+  const dispatch = useAppDispatch();
 
   const locationIndexApi = useApi({
     api: locationIndex,
   });
+
+  const saveInApi = useApi({
+    api: saveIn,
+    onSuccess: () => {
+      dispatch(toast("Berhasil"));
+    },
+    onFail: () => {
+      dispatch(toast("Wajah tidak dikenali"));
+    },
+  });
+
+  const saveOutApi = useApi({
+    api: saveOut,
+    onSuccess: () => {
+      dispatch(toast("Berhasil"));
+    },
+    onFail: () => {
+      dispatch(toast("Wajah tidak dikenali"));
+    },
+  });
+
+  const openAttend = (type: "in" | "out") => {
+    if (
+      locationIndexApi.data?.rows.find(
+        (location) => location.distance && location.distance < 0.5
+      )
+    ) {
+      setAttendShown(type);
+    } else {
+      dispatch(toast("Anda diluar area yang diizinkan"));
+    }
+  };
+
+  const onAttend = async (type: "in" | "out") => {
+    if (!location || !cameraRef) return;
+
+    const photo = await cameraRef.current!.takePictureAsync({
+      quality: 0.5,
+      skipProcessing: true,
+      isImageMirror: true,
+    });
+    const flipPhoto = await manipulateAsync(
+      photo.uri,
+      [{ flip: FlipType.Horizontal }],
+      { compress: 1, format: SaveFormat.PNG }
+    );
+
+    setAttendShown(false);
+
+    (type === "in" ? saveInApi : saveOutApi).process({
+      face: toFile(flipPhoto.uri, "camera.jpg", "image/jpeg"),
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    });
+  };
 
   useEffect(() => {
     (async () => {
@@ -73,6 +138,14 @@ export default function Home() {
       });
     }
   }, [location]);
+
+  useEffect(() => {
+    if (saveInApi.isLoading || saveOutApi.isLoading) {
+      dispatch(showLoading());
+    } else {
+      dispatch(hideLoading());
+    }
+  }, [saveInApi.isLoading || saveOutApi.isLoading]);
 
   if (locationError)
     return (
@@ -194,7 +267,7 @@ export default function Home() {
               flex: 1,
             }}
           >
-            {locationIndexApi.isLoading
+            {locationIndexApi.isLoading || !location
               ? "Mencari..."
               : locationIndexApi.data?.rows.find(
                   (location) => location.distance && location.distance < 0.5
@@ -233,7 +306,7 @@ export default function Home() {
                 flex: 1,
                 marginRight: 8,
               }}
-              onPress={() => setAttendShown(true)}
+              onPress={() => openAttend("in")}
             >
               <Text style={{ marginLeft: 8 }}> Absen Masuk</Text>
             </BlockButton>
@@ -242,7 +315,7 @@ export default function Home() {
                 flex: 1,
                 marginLeft: 8,
               }}
-              onPress={() => setAttendShown(true)}
+              onPress={() => openAttend("out")}
             >
               Absen Keluar
             </BlockButton>
@@ -263,7 +336,7 @@ export default function Home() {
         />
       )}
       <Modal
-        visible={attendShown}
+        visible={Boolean(attendShown)}
         animationType="slide"
         onRequestClose={() => setAttendShown(false)}
         transparent={true}
@@ -324,15 +397,23 @@ export default function Home() {
                 {permission?.granted && attendShown && (
                   <Camera
                     type={CameraType.front}
+                    autoFocus={AutoFocus.on}
+                    flashMode={FlashMode.auto}
                     ratio="1:1"
+                    useCamera2Api
                     style={{
                       width: "100%",
                       height: "100%",
                     }}
+                    ref={cameraRef as LegacyRef<Camera>}
                   />
                 )}
               </View>
-              <BlockButton>Ambil</BlockButton>
+              <BlockButton
+                onPress={() => onAttend(attendShown as "in" | "out")}
+              >
+                Ambil
+              </BlockButton>
             </View>
           </View>
         </PanGestureHandler>

@@ -13,6 +13,7 @@ import { colors } from "../src/styles";
 import CheckToken from "../src/components/CheckToken";
 import moment from "moment";
 import "moment/locale/id";
+import Toast from "../src/components/Toast";
 
 moment.locale("id");
 
@@ -56,6 +57,7 @@ export default function AppLayout() {
         />
       </Stack>
       <StatusBar backgroundColor={colors.grayscale[800]} style="dark" />
+      <Toast />
       <Loader />
     </Provider>
   );
