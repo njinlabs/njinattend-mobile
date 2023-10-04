@@ -1,5 +1,5 @@
 export default function generateUrl(url: string) {
-  if (url.match(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/)) {
+  if (url.match(/^(http:\/\/|https:\/\/)/)) {
     return url;
   }
 
