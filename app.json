@@ -28,7 +28,8 @@
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE"
       ],
-      "package": "com.njintech.attend"
+      "package": "com.njintech.attend",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png"
