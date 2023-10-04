@@ -35,7 +35,7 @@ export default function AttendPoint() {
     dispatch(showLoading());
 
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      let { status } = await Location.getForegroundPermissionsAsync();
       if (status === "granted") {
         setLocationError(false);
       } else {
