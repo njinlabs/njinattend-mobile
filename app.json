@@ -1,7 +1,7 @@
 {
   "expo": {
     "scheme": "com.njintech.attend",
-    "name": "njinattend-mobile",
+    "name": "NjinAttend",
     "slug": "njinattend-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,9 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -29,7 +27,8 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.FOREGROUND_SERVICE"
-      ]
+      ],
+      "package": "com.njintech.attend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,10 +36,7 @@
     "plugins": [
       "expo-router",
       "expo-camera",
-      [
-        "expo-location",
-        "locationAlwaysAndWhenInUsePermission"
-      ]
+      ["expo-location", "locationAlwaysAndWhenInUsePermission"]
     ],
     "extra": {
       "router": {
