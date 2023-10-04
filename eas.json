@@ -1,0 +1,35 @@
+{
+  "cli": {
+    "version": ">= 5.4.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://attend.njintech.com"
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://attend.njintech.com"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
